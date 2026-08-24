@@ -1,0 +1,1035 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#4f46e5">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Спорт Такси">
+<title>Спорт Такси</title>
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" type="image/png" href="icon-192.png">
+<link rel="manifest" href="manifest.json">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root, [data-theme="light"] {
+    --bg:#f4f5fb; --bg2:#ffffff; --bg3:#eceefb;
+    --border:#dfe1f0; --accent:#4f46e5; --accent2:#f97316;
+    --green:#16a34a; --amber:#d97706; --red:#dc2626;
+    --text:#1a1c2e; --text2:#565a76; --text3:#9599b4;
+    --radius:14px; --font:'Inter',system-ui,sans-serif; --mono:'JetBrains Mono',monospace;
+  }
+  [data-theme="dark"] {
+    --bg:#12131c; --bg2:#1b1d29; --bg3:#252838;
+    --border:#31344a; --accent:#7c74ff; --accent2:#fb923c;
+    --green:#4ade80; --amber:#fbbf24; --red:#f87171;
+    --text:#eef0fb; --text2:#a4a8c4; --text3:#6b6f8c;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html,body { overscroll-behavior-y:none; }
+  body { font-family:var(--font); background:var(--bg); color:var(--text); min-height:100vh; max-width:480px; margin:0 auto; padding-bottom:92px; -webkit-font-smoothing:antialiased; }
+
+  /* HEADER */
+  .header { position:sticky; top:0; z-index:100; background:var(--bg2); backdrop-filter:blur(16px); border-bottom:1px solid var(--border); padding:11px 18px; display:flex; align-items:center; justify-content:space-between; }
+  .header-brand { display:flex; align-items:center; gap:10px; }
+  .header-logo { width:34px; height:34px; border-radius:10px; background:linear-gradient(135deg,var(--accent),var(--accent2)); display:flex; align-items:center; justify-content:center; font-size:18px; }
+  .header-title { font-size:16px; font-weight:800; letter-spacing:-0.3px; }
+  .header-sub { font-size:11px; color:var(--text2); font-family:var(--mono); margin-top:1px; }
+  .header-btn { width:38px; height:38px; border-radius:10px; background:var(--bg3); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:18px; cursor:pointer; transition:transform .15s; }
+  .header-btn:active { transform:scale(.92); }
+
+  /* PAGES */
+  .page { display:none; padding:14px 16px 20px; animation:fade .2s ease; }
+  .page.active { display:block; }
+  @keyframes fade { from{opacity:0;transform:translateY(4px);} to{opacity:1;transform:translateY(0);} }
+
+  .section-label { font-size:11px; font-weight:700; letter-spacing:1.1px; color:var(--text3); text-transform:uppercase; margin:20px 2px 10px; display:flex; align-items:center; justify-content:space-between; }
+  .section-label:first-child { margin-top:4px; }
+
+  /* MONTH PICKER */
+  .month-bar { display:flex; align-items:center; justify-content:space-between; gap:8px; background:var(--bg2); border:1px solid var(--border); border-radius:12px; padding:8px 10px; margin-bottom:14px; }
+  .month-nav { width:38px; height:38px; border-radius:10px; border:1px solid var(--border); background:var(--bg3); font-size:18px; color:var(--text); cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all .15s; }
+  .month-nav:active { transform:scale(.9); border-color:var(--accent); }
+  .month-label { flex:1; text-align:center; font-size:15px; font-weight:700; text-transform:capitalize; }
+  .month-year { font-size:11px; color:var(--text2); font-family:var(--mono); }
+
+  /* STAT CARDS */
+  .stats-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:6px; }
+  .stat-card { background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius); padding:14px; }
+  .stat-card.wide { grid-column:1 / -1; background:linear-gradient(135deg,var(--accent),var(--accent2)); border:none; color:#fff; }
+  .stat-label { font-size:10.5px; font-weight:600; text-transform:uppercase; letter-spacing:.7px; color:var(--text3); margin-bottom:5px; }
+  .stat-card.wide .stat-label { color:rgba(255,255,255,.85); }
+  .stat-value { font-size:22px; font-weight:800; font-family:var(--mono); line-height:1; }
+  .stat-value small { font-size:13px; font-weight:600; opacity:.7; }
+  .stat-card.wide .stat-value { font-size:28px; }
+  .stat-value.green { color:var(--green); }
+  .stat-value.amber { color:var(--amber); }
+  .stat-value.red { color:var(--red); }
+  .stat-sub { font-size:11px; color:var(--text2); margin-top:5px; font-family:var(--mono); }
+  .stat-card.wide .stat-sub { color:rgba(255,255,255,.85); }
+
+  .progress { height:8px; border-radius:6px; background:rgba(255,255,255,.25); overflow:hidden; margin-top:12px; }
+  .progress > span { display:block; height:100%; border-radius:6px; background:#fff; transition:width .4s; }
+
+  /* GROUP BLOCK */
+  .group-block { margin-bottom:14px; }
+  .group-head { display:flex; align-items:center; gap:10px; padding:4px 2px 10px; }
+  .group-dot { width:12px; height:12px; border-radius:4px; flex-shrink:0; }
+  .group-name { font-size:14px; font-weight:700; flex:1; }
+  .group-meta { font-size:11px; color:var(--text2); font-family:var(--mono); }
+
+  /* CHILD ROW */
+  .child-row { background:var(--bg2); border:1px solid var(--border); border-radius:12px; padding:11px 12px; margin-bottom:8px; display:flex; align-items:center; gap:11px; transition:border-color .15s; }
+  .child-avatar { width:40px; height:40px; border-radius:11px; display:flex; align-items:center; justify-content:center; font-size:15px; font-weight:700; color:#fff; flex-shrink:0; }
+  .child-info { flex:1; min-width:0; }
+  .child-name { font-size:14px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .child-sub { font-size:11.5px; color:var(--text2); margin-top:2px; display:flex; align-items:center; gap:6px; }
+  .child-sub .amt { font-family:var(--mono); font-weight:600; }
+  .pay-toggle { flex-shrink:0; border:none; border-radius:10px; padding:9px 14px; font-size:12.5px; font-weight:700; font-family:var(--font); cursor:pointer; transition:all .15s; min-width:86px; text-align:center; }
+  .pay-toggle:active { transform:scale(.95); }
+  .pay-toggle.paid { background:rgba(22,163,74,.14); color:var(--green); }
+  .pay-toggle.partial { background:rgba(217,119,6,.16); color:var(--amber); }
+  .pay-toggle.unpaid { background:var(--accent); color:#fff; }
+  [data-theme="dark"] .pay-toggle.unpaid { color:#fff; }
+  .child-row.inactive { opacity:.5; }
+
+  /* PILL / BADGE */
+  .badge { font-size:10px; font-weight:700; padding:2px 8px; border-radius:20px; text-transform:uppercase; letter-spacing:.4px; }
+  .badge.paid { background:rgba(22,163,74,.14); color:var(--green); }
+  .badge.partial { background:rgba(217,119,6,.16); color:var(--amber); }
+  .badge.unpaid { background:rgba(220,38,38,.13); color:var(--red); }
+
+  /* CARD / FIELDS */
+  .card { background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius); padding:16px; margin-bottom:12px; }
+  .field { margin-bottom:13px; }
+  .field:last-child { margin-bottom:0; }
+  .field label { display:block; font-size:12px; font-weight:600; color:var(--text2); margin-bottom:6px; }
+  .field input, .field select, .field textarea { width:100%; background:var(--bg3); border:1px solid var(--border); border-radius:10px; padding:12px 14px; color:var(--text); font-family:var(--font); font-size:15px; outline:none; transition:border-color .2s; appearance:none; }
+  .field textarea { resize:vertical; min-height:64px; }
+  .field input:focus, .field select:focus, .field textarea:focus { border-color:var(--accent); }
+  .field select { background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%239599b4' stroke-width='1.6' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 14px center; padding-right:36px; }
+  .row2 { display:flex; gap:10px; }
+  .row2 > * { flex:1; }
+
+  /* COLOR PICKER */
+  .color-row { display:flex; gap:8px; flex-wrap:wrap; }
+  .color-swatch { width:34px; height:34px; border-radius:9px; cursor:pointer; border:3px solid transparent; transition:transform .12s; }
+  .color-swatch:active { transform:scale(.9); }
+  .color-swatch.sel { border-color:var(--text); }
+
+  /* BUTTONS */
+  .btn { width:100%; padding:15px; border-radius:12px; border:none; font-size:15px; font-weight:700; cursor:pointer; font-family:var(--font); transition:all .18s; }
+  .btn:active { transform:scale(.98); opacity:.92; }
+  .btn-primary { background:linear-gradient(135deg,var(--accent),var(--accent2)); color:#fff; }
+  .btn-ghost { background:var(--bg3); border:1px solid var(--border); color:var(--text); }
+  .btn-danger { background:rgba(220,38,38,.12); color:var(--red); }
+  .btn-sm { padding:9px 14px; font-size:13px; width:auto; border-radius:10px; }
+
+  .add-btn { display:flex; align-items:center; justify-content:center; gap:7px; width:100%; padding:13px; border-radius:12px; border:1.5px dashed var(--border); background:transparent; color:var(--text2); font-size:14px; font-weight:600; font-family:var(--font); cursor:pointer; transition:all .15s; }
+  .add-btn:active { border-color:var(--accent); color:var(--accent); }
+
+  /* MANAGE ROW */
+  .manage-row { display:flex; align-items:center; gap:11px; background:var(--bg2); border:1px solid var(--border); border-radius:12px; padding:11px 13px; margin-bottom:8px; }
+  .manage-info { flex:1; min-width:0; }
+  .manage-title { font-size:14px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .manage-sub { font-size:11.5px; color:var(--text2); margin-top:2px; }
+  .icon-btn { width:34px; height:34px; border-radius:9px; border:1px solid var(--border); background:var(--bg3); color:var(--text2); font-size:16px; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:all .15s; }
+  .icon-btn:active { transform:scale(.9); }
+
+  /* EMPTY */
+  .empty { text-align:center; padding:44px 20px; color:var(--text3); }
+  .empty .em-icon { font-size:44px; margin-bottom:12px; }
+  .empty .em-title { font-size:15px; font-weight:600; color:var(--text2); margin-bottom:4px; }
+  .empty .em-sub { font-size:13px; }
+
+  /* PAYMENT HISTORY ITEM */
+  .pay-item { display:flex; align-items:center; gap:11px; background:var(--bg2); border:1px solid var(--border); border-radius:12px; padding:11px 13px; margin-bottom:8px; }
+  .pay-icon { width:38px; height:38px; border-radius:11px; background:rgba(22,163,74,.13); color:var(--green); display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0; }
+  .pay-body { flex:1; min-width:0; }
+  .pay-name { font-size:14px; font-weight:600; }
+  .pay-when { font-size:11.5px; color:var(--text2); font-family:var(--mono); margin-top:2px; }
+  .pay-amount { font-family:var(--mono); font-size:15px; font-weight:700; color:var(--green); flex-shrink:0; }
+
+  /* DEBTOR ROW */
+  .debtor-row { display:flex; align-items:center; gap:11px; background:var(--bg2); border:1px solid var(--border); border-radius:12px; padding:11px 13px; margin-bottom:8px; }
+  .debtor-row .amt { font-family:var(--mono); font-size:15px; font-weight:700; color:var(--red); flex-shrink:0; }
+
+  /* BOTTOM NAV */
+  .bottom-nav { position:fixed; bottom:0; left:50%; transform:translateX(-50%); width:100%; max-width:480px; background:var(--bg2); backdrop-filter:blur(16px); border-top:1px solid var(--border); display:flex; padding:6px 12px 12px; z-index:100; }
+  .nav-btn { flex:1; display:flex; flex-direction:column; align-items:center; gap:3px; padding:6px 4px; border-radius:12px; cursor:pointer; border:none; background:transparent; color:var(--text3); transition:all .2s; }
+  .nav-btn.active { color:var(--accent); background:var(--bg3); }
+  .nav-icon { font-size:21px; line-height:1; }
+  .nav-label { font-size:10px; font-weight:600; }
+
+  /* MODAL / SHEET */
+  .overlay { position:fixed; inset:0; background:rgba(0,0,0,.45); z-index:200; opacity:0; pointer-events:none; transition:opacity .22s; }
+  .overlay.open { opacity:1; pointer-events:auto; }
+  .sheet { position:fixed; left:50%; bottom:0; transform:translateX(-50%) translateY(100%); width:100%; max-width:480px; background:var(--bg); border-radius:22px 22px 0 0; z-index:210; transition:transform .28s cubic-bezier(.32,.72,0,1); max-height:92vh; display:flex; flex-direction:column; }
+  .sheet.open { transform:translateX(-50%) translateY(0); }
+  .sheet-handle { width:40px; height:4px; border-radius:3px; background:var(--border); margin:10px auto 4px; flex-shrink:0; }
+  .sheet-head { display:flex; align-items:center; justify-content:space-between; padding:8px 18px 12px; flex-shrink:0; }
+  .sheet-title { font-size:18px; font-weight:800; }
+  .sheet-close { width:32px; height:32px; border-radius:9px; border:none; background:var(--bg3); color:var(--text2); font-size:17px; cursor:pointer; }
+  .sheet-body { padding:0 18px 24px; overflow-y:auto; }
+
+  /* SEGMENTED */
+  .seg { display:flex; background:var(--bg3); border:1px solid var(--border); border-radius:11px; padding:3px; gap:3px; margin-bottom:14px; }
+  .seg-btn { flex:1; padding:9px; border:none; background:transparent; border-radius:8px; font-size:13px; font-weight:600; color:var(--text2); cursor:pointer; font-family:var(--font); transition:all .15s; }
+  .seg-btn.active { background:var(--bg2); color:var(--text); box-shadow:0 1px 3px rgba(0,0,0,.08); }
+
+  /* TOAST */
+  .toast { position:fixed; top:74px; left:50%; transform:translateX(-50%) translateY(-16px); background:var(--bg2); border:1px solid var(--border); box-shadow:0 6px 24px rgba(0,0,0,.16); border-radius:12px; padding:12px 18px; font-size:14px; font-weight:600; opacity:0; transition:all .3s; z-index:999; pointer-events:none; max-width:90%; text-align:center; }
+  .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+  .toast.success { border-color:var(--green); }
+  .toast.error { border-color:var(--red); }
+
+  .search-box { position:relative; margin-bottom:12px; }
+  .search-box input { width:100%; background:var(--bg2); border:1px solid var(--border); border-radius:12px; padding:12px 14px 12px 40px; color:var(--text); font-family:var(--font); font-size:14px; outline:none; }
+  .search-box input:focus { border-color:var(--accent); }
+  .search-box .s-icon { position:absolute; left:14px; top:50%; transform:translateY(-50%); font-size:15px; opacity:.5; }
+
+  .settings-row { display:flex; align-items:center; justify-content:space-between; padding:14px 0; border-bottom:1px solid var(--border); }
+  .settings-row:last-child { border-bottom:none; }
+  .settings-row .lab { font-size:14px; font-weight:600; }
+  .settings-row .desc { font-size:12px; color:var(--text2); margin-top:2px; }
+</style>
+</head>
+<body data-theme="light">
+
+<div class="header">
+  <div class="header-brand">
+    <div class="header-logo">⚽</div>
+    <div>
+      <div class="header-title" id="orgName">Спорт Такси</div>
+      <div class="header-sub" id="orgSub">Управление на такси</div>
+    </div>
+  </div>
+  <div class="header-btn" onclick="openSettings()">⚙️</div>
+</div>
+
+<!-- ===================== НАЧАЛО ===================== -->
+<div class="page active" id="page-home">
+  <div class="month-bar">
+    <button class="month-nav" onclick="changeMonth(-1)">‹</button>
+    <div>
+      <div class="month-label" id="homeMonthLabel">—</div>
+      <div class="month-year" id="homeMonthYear" style="text-align:center"></div>
+    </div>
+    <button class="month-nav" onclick="changeMonth(1)">›</button>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card wide">
+      <div class="stat-label">Събрано този месец</div>
+      <div class="stat-value" id="homeCollected">0 <small>лв</small></div>
+      <div class="stat-sub" id="homeExpectedSub">от 0 лв очаквани</div>
+      <div class="progress"><span id="homeProgress" style="width:0%"></span></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Платили</div>
+      <div class="stat-value green" id="homePaidCount">0</div>
+      <div class="stat-sub" id="homeActiveSub">от 0 деца</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Дължат</div>
+      <div class="stat-value red" id="homeDebtCount">0</div>
+      <div class="stat-sub" id="homeDebtSum">0 лв дълг</div>
+    </div>
+  </div>
+
+  <div class="section-label">Бърз преглед по групи</div>
+  <div id="homeGroupsSummary"></div>
+</div>
+
+<!-- ===================== ТАКСИ ===================== -->
+<div class="page" id="page-fees">
+  <div class="month-bar">
+    <button class="month-nav" onclick="changeMonth(-1)">‹</button>
+    <div>
+      <div class="month-label" id="feesMonthLabel">—</div>
+      <div class="month-year" id="feesMonthYear" style="text-align:center"></div>
+    </div>
+    <button class="month-nav" onclick="changeMonth(1)">›</button>
+  </div>
+
+  <div class="seg" id="feesFilter">
+    <button class="seg-btn active" data-f="all" onclick="setFeesFilter('all')">Всички</button>
+    <button class="seg-btn" data-f="unpaid" onclick="setFeesFilter('unpaid')">Дължат</button>
+    <button class="seg-btn" data-f="paid" onclick="setFeesFilter('paid')">Платили</button>
+  </div>
+
+  <div class="search-box">
+    <span class="s-icon">🔍</span>
+    <input type="text" id="feesSearch" placeholder="Търси дете..." oninput="renderFees()">
+  </div>
+
+  <div id="feesList"></div>
+</div>
+
+<!-- ===================== ДЕЦА ===================== -->
+<div class="page" id="page-kids">
+  <div class="seg" id="kidsTab">
+    <button class="seg-btn active" data-t="children" onclick="setKidsTab('children')">Деца</button>
+    <button class="seg-btn" data-t="groups" onclick="setKidsTab('groups')">Групи</button>
+  </div>
+
+  <div id="kidsChildrenView">
+    <div class="search-box">
+      <span class="s-icon">🔍</span>
+      <input type="text" id="kidsSearch" placeholder="Търси дете..." oninput="renderChildren()">
+    </div>
+    <button class="add-btn" onclick="openChildSheet()" style="margin-bottom:12px">＋ Добави дете</button>
+    <div id="childrenList"></div>
+  </div>
+
+  <div id="kidsGroupsView" style="display:none">
+    <button class="add-btn" onclick="openGroupSheet()" style="margin-bottom:12px">＋ Добави група</button>
+    <div id="groupsList"></div>
+  </div>
+</div>
+
+<!-- ===================== СПРАВКИ ===================== -->
+<div class="page" id="page-reports">
+  <div class="section-label">Обобщение</div>
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-label">Общо събрано</div>
+      <div class="stat-value green" id="repTotal">0 <small>лв</small></div>
+      <div class="stat-sub" id="repTotalSub">за цялата история</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Активни деца</div>
+      <div class="stat-value" id="repKids">0</div>
+      <div class="stat-sub" id="repGroups">0 групи</div>
+    </div>
+  </div>
+
+  <div class="section-label" style="margin-top:22px">Приход по месеци</div>
+  <div class="card" id="repMonthly"></div>
+
+  <div class="section-label" style="margin-top:22px">Длъжници (текущ месец)</div>
+  <div id="repDebtors"></div>
+
+  <div class="section-label" style="margin-top:22px">Последни плащания</div>
+  <div id="repPayments"></div>
+
+  <button class="btn btn-ghost" style="margin-top:16px" onclick="exportCSV()">⬇️ Експорт CSV</button>
+</div>
+
+<!-- ===================== BOTTOM NAV ===================== -->
+<div class="bottom-nav">
+  <button class="nav-btn active" data-p="home" onclick="nav('home')"><span class="nav-icon">🏠</span><span class="nav-label">Начало</span></button>
+  <button class="nav-btn" data-p="fees" onclick="nav('fees')"><span class="nav-icon">💳</span><span class="nav-label">Такси</span></button>
+  <button class="nav-btn" data-p="kids" onclick="nav('kids')"><span class="nav-icon">🧒</span><span class="nav-label">Деца</span></button>
+  <button class="nav-btn" data-p="reports" onclick="nav('reports')"><span class="nav-icon">📊</span><span class="nav-label">Справки</span></button>
+</div>
+
+<!-- ===================== OVERLAY + SHEET ===================== -->
+<div class="overlay" id="overlay" onclick="closeSheet()"></div>
+<div class="sheet" id="sheet">
+  <div class="sheet-handle"></div>
+  <div class="sheet-head">
+    <div class="sheet-title" id="sheetTitle">—</div>
+    <button class="sheet-close" onclick="closeSheet()">✕</button>
+  </div>
+  <div class="sheet-body" id="sheetBody"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============================================================
+   Спорт Такси — самостоятелно PWA (localStorage)
+   Данните се пазят локално на устройството.
+   ============================================================ */
+
+const STORE_KEY = 'sportfees_v1';
+const COLORS = ['#4f46e5','#f97316','#16a34a','#0ea5e9','#db2777','#8b5cf6','#eab308','#ef4444','#14b8a6','#64748b'];
+const MONTHS_BG = ['Януари','Февруари','Март','Април','Май','Юни','Юли','Август','Септември','Октомври','Ноември','Декември'];
+
+let db = loadDB();
+let cur = new Date();                    // текущо избран месец
+let curMonth = ymKey(cur);
+let feesFilter = 'all';
+let kidsTab = 'children';
+
+/* ---------- Storage ---------- */
+function loadDB() {
+  try {
+    const raw = localStorage.getItem(STORE_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch(e){}
+  return { groups:[], children:[], payments:[], settings:{ orgName:'Спорт Такси', sub:'Управление на такси', currency:'лв', theme:'light' } };
+}
+function saveDB() { localStorage.setItem(STORE_KEY, JSON.stringify(db)); }
+function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+
+/* ---------- Helpers ---------- */
+function ymKey(d){ return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0'); }
+function fmt(n){ return (Math.round(n*100)/100).toLocaleString('bg-BG'); }
+function cur$(){ return db.settings.currency || 'лв'; }
+function initials(name){ const p=name.trim().split(/\s+/); return ((p[0]||'')[0]||'') + (p.length>1?(p[p.length-1][0]||''):'') ; }
+function groupById(id){ return db.groups.find(g=>g.id===id); }
+function activeChildren(){ return db.children.filter(c=>c.active!==false); }
+
+// Дължима такса за дете за даден месец (индивидуална такса или тази на групата)
+function feeFor(child){
+  if (child.fee!=null && child.fee!=='' ) return Number(child.fee);
+  const g = groupById(child.groupId);
+  return g ? Number(g.fee||0) : 0;
+}
+// Платено от дете за месец
+function paidFor(childId, month){
+  return db.payments.filter(p=>p.childId===childId && p.month===month)
+                    .reduce((s,p)=>s+Number(p.amount||0),0);
+}
+// Статус: paid / partial / unpaid
+function statusFor(child, month){
+  const fee = feeFor(child);
+  const paid = paidFor(child.id, month);
+  if (fee<=0) return paid>0 ? 'paid' : 'paid';   // без такса → не дължи
+  if (paid<=0) return 'unpaid';
+  if (paid >= fee) return 'paid';
+  return 'partial';
+}
+
+/* ---------- Navigation ---------- */
+function nav(p){
+  document.querySelectorAll('.page').forEach(el=>el.classList.remove('active'));
+  document.getElementById('page-'+p).classList.add('active');
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.toggle('active', b.dataset.p===p));
+  window.scrollTo(0,0);
+  if (p==='home') renderHome();
+  if (p==='fees') renderFees();
+  if (p==='kids') renderKids();
+  if (p==='reports') renderReports();
+}
+
+function changeMonth(delta){
+  cur.setMonth(cur.getMonth()+delta);
+  curMonth = ymKey(cur);
+  updateMonthLabels();
+  renderHome(); renderFees();
+}
+function updateMonthLabels(){
+  const lbl = MONTHS_BG[cur.getMonth()];
+  const yr = cur.getFullYear();
+  ['home','fees'].forEach(pfx=>{
+    const l=document.getElementById(pfx+'MonthLabel'); if(l) l.textContent=lbl;
+    const y=document.getElementById(pfx+'MonthYear'); if(y) y.textContent=yr;
+  });
+}
+
+/* ---------- Toast ---------- */
+let toastT;
+function toast(msg, type){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.className='toast show '+(type||'');
+  clearTimeout(toastT);
+  toastT=setTimeout(()=>t.className='toast '+(type||''),2200);
+}
+
+/* ============================================================
+   HOME
+   ============================================================ */
+function renderHome(){
+  const kids = activeChildren();
+  let collected=0, expected=0, paidCount=0, debtCount=0, debtSum=0;
+  kids.forEach(c=>{
+    const fee=feeFor(c), paid=Math.min(paidFor(c.id,curMonth), fee||paidFor(c.id,curMonth));
+    const realPaid=paidFor(c.id,curMonth);
+    expected+=fee;
+    collected+=Math.min(realPaid, fee||realPaid);
+    const st=statusFor(c,curMonth);
+    if (st==='paid') paidCount++;
+    else { debtCount++; debtSum += Math.max(0, fee-realPaid); }
+  });
+  document.getElementById('homeCollected').innerHTML = fmt(collected)+' <small>'+cur$()+'</small>';
+  document.getElementById('homeExpectedSub').textContent = 'от '+fmt(expected)+' '+cur$()+' очаквани';
+  const pct = expected>0 ? Math.min(100, Math.round(collected/expected*100)) : 0;
+  document.getElementById('homeProgress').style.width = pct+'%';
+  document.getElementById('homePaidCount').textContent = paidCount;
+  document.getElementById('homeActiveSub').textContent = 'от '+kids.length+' деца';
+  document.getElementById('homeDebtCount').textContent = debtCount;
+  document.getElementById('homeDebtSum').textContent = fmt(debtSum)+' '+cur$()+' дълг';
+
+  // Групи резюме
+  const box=document.getElementById('homeGroupsSummary');
+  if (db.groups.length===0){
+    box.innerHTML = emptyBox('👥','Няма групи още','Създай група в раздел „Деца“');
+    return;
+  }
+  box.innerHTML = db.groups.map(g=>{
+    const gk=kids.filter(c=>c.groupId===g.id);
+    const paid=gk.filter(c=>statusFor(c,curMonth)==='paid').length;
+    const total=gk.length;
+    const pct=total>0?Math.round(paid/total*100):0;
+    return `<div class="child-row" onclick="nav('fees')" style="cursor:pointer">
+      <div class="child-avatar" style="background:${g.color||'#4f46e5'}">${(g.name[0]||'?').toUpperCase()}</div>
+      <div class="child-info">
+        <div class="child-name">${esc(g.name)}</div>
+        <div class="child-sub"><span class="amt">${fmt(g.fee||0)} ${cur$()}/мес</span> · ${total} деца</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-family:var(--mono);font-weight:700;font-size:15px">${paid}/${total}</div>
+        <div style="font-size:11px;color:var(--text2)">${pct}% платено</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* ============================================================
+   FEES
+   ============================================================ */
+function setFeesFilter(f){
+  feesFilter=f;
+  document.querySelectorAll('#feesFilter .seg-btn').forEach(b=>b.classList.toggle('active',b.dataset.f===f));
+  renderFees();
+}
+function renderFees(){
+  updateMonthLabels();
+  const q=(document.getElementById('feesSearch').value||'').toLowerCase().trim();
+  let kids=activeChildren();
+  if (q) kids=kids.filter(c=>c.name.toLowerCase().includes(q));
+  kids=kids.filter(c=>{
+    const st=statusFor(c,curMonth);
+    if (feesFilter==='paid') return st==='paid';
+    if (feesFilter==='unpaid') return st!=='paid';
+    return true;
+  });
+
+  const list=document.getElementById('feesList');
+  if (activeChildren().length===0){
+    list.innerHTML=emptyBox('🧒','Няма деца още','Добави деца в раздел „Деца“');
+    return;
+  }
+  if (kids.length===0){ list.innerHTML=emptyBox('✅','Няма резултати','Промени филтъра или търсенето'); return; }
+
+  // групиране по групи
+  const byGroup={};
+  kids.forEach(c=>{ const gid=c.groupId||'none'; (byGroup[gid]=byGroup[gid]||[]).push(c); });
+  const order=[...db.groups.map(g=>g.id),'none'];
+  let html='';
+  order.forEach(gid=>{
+    const arr=byGroup[gid]; if(!arr||!arr.length) return;
+    const g=groupById(gid);
+    html+=`<div class="group-block"><div class="group-head">
+        <div class="group-dot" style="background:${g?g.color:'#9599b4'}"></div>
+        <div class="group-name">${g?esc(g.name):'Без група'}</div>
+        <div class="group-meta">${arr.length} деца</div>
+      </div>`;
+    arr.sort((a,b)=>a.name.localeCompare(b.name,'bg'));
+    arr.forEach(c=>{ html+=childFeeRow(c); });
+    html+='</div>';
+  });
+  list.innerHTML=html;
+}
+function childFeeRow(c){
+  const g=groupById(c.groupId);
+  const fee=feeFor(c);
+  const paid=paidFor(c.id,curMonth);
+  const st=statusFor(c,curMonth);
+  let btnLabel, btnClass;
+  if (st==='paid'){ btnLabel='✓ Платено'; btnClass='paid'; }
+  else if (st==='partial'){ btnLabel=fmt(paid)+'/'+fmt(fee); btnClass='partial'; }
+  else { btnLabel='Плати'; btnClass='unpaid'; }
+  const color=g?g.color:'#9599b4';
+  return `<div class="child-row">
+    <div class="child-avatar" style="background:${color}">${esc(initials(c.name)).toUpperCase()}</div>
+    <div class="child-info" onclick="openPaymentSheet('${c.id}')" style="cursor:pointer">
+      <div class="child-name">${esc(c.name)}</div>
+      <div class="child-sub"><span class="amt">${fmt(fee)} ${cur$()}</span>${paid>0&&st!=='paid'?' · платил '+fmt(paid):''}</div>
+    </div>
+    <button class="pay-toggle ${btnClass}" onclick="quickToggle('${c.id}')">${btnLabel}</button>
+  </div>`;
+}
+// Бърз бутон: неплатено → отбележи пълно; платено → отвори детайли
+function quickToggle(childId){
+  const c=db.children.find(x=>x.id===childId); if(!c) return;
+  const st=statusFor(c,curMonth);
+  if (st==='paid'){ openPaymentSheet(childId); return; }
+  const fee=feeFor(c);
+  const already=paidFor(childId,curMonth);
+  const remaining=Math.max(0, fee-already);
+  if (remaining<=0){ openPaymentSheet(childId); return; }
+  db.payments.push({ id:uid(), childId, month:curMonth, amount:remaining, date:new Date().toISOString(), method:'cash', note:'' });
+  saveDB();
+  toast('✓ '+c.name+' — платено', 'success');
+  renderFees(); renderHome();
+}
+
+/* ---------- Payment sheet ---------- */
+function openPaymentSheet(childId){
+  const c=db.children.find(x=>x.id===childId); if(!c) return;
+  const fee=feeFor(c);
+  const paid=paidFor(childId,curMonth);
+  const remaining=Math.max(0, fee-paid);
+  const monthLbl=MONTHS_BG[cur.getMonth()]+' '+cur.getFullYear();
+  const history=db.payments.filter(p=>p.childId===childId && p.month===curMonth)
+                           .sort((a,b)=>new Date(b.date)-new Date(a.date));
+  setSheet('Плащане', `
+    <div class="card" style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
+      <div class="child-avatar" style="background:${(groupById(c.groupId)||{}).color||'#4f46e5'}">${esc(initials(c.name)).toUpperCase()}</div>
+      <div style="flex:1">
+        <div style="font-weight:700;font-size:16px">${esc(c.name)}</div>
+        <div style="font-size:12px;color:var(--text2)">${esc((groupById(c.groupId)||{}).name||'Без група')} · ${monthLbl}</div>
+      </div>
+      <span class="badge ${statusFor(c,curMonth)}">${statusLabel(statusFor(c,curMonth))}</span>
+    </div>
+
+    <div class="stats-grid" style="margin-bottom:14px">
+      <div class="stat-card"><div class="stat-label">Такса</div><div class="stat-value" style="font-size:18px">${fmt(fee)} <small>${cur$()}</small></div></div>
+      <div class="stat-card"><div class="stat-label">Остатък</div><div class="stat-value ${remaining>0?'red':'green'}" style="font-size:18px">${fmt(remaining)} <small>${cur$()}</small></div></div>
+    </div>
+
+    <div class="field">
+      <label>Сума на плащане (${cur$()})</label>
+      <input type="number" inputmode="decimal" id="payAmount" value="${remaining>0?remaining:fee}" step="0.01">
+    </div>
+    <div class="field">
+      <label>Начин</label>
+      <select id="payMethod">
+        <option value="cash">В брой</option>
+        <option value="card">Карта</option>
+        <option value="bank">Банков превод</option>
+        <option value="other">Друго</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Бележка (по избор)</label>
+      <input type="text" id="payNote" placeholder="напр. частично плащане">
+    </div>
+    <button class="btn btn-primary" onclick="addPayment('${childId}')">Запиши плащане</button>
+
+    ${history.length? `<div class="section-label" style="margin-top:22px">Плащания този месец</div>${history.map(p=>payHistRow(p)).join('')}`:''}
+  `);
+}
+function statusLabel(st){ return st==='paid'?'Платено':st==='partial'?'Частично':'Дължи'; }
+function payHistRow(p){
+  const d=new Date(p.date);
+  return `<div class="pay-item">
+    <div class="pay-icon">💵</div>
+    <div class="pay-body">
+      <div class="pay-name">${methodLabel(p.method)}${p.note?' · '+esc(p.note):''}</div>
+      <div class="pay-when">${d.toLocaleDateString('bg-BG')} ${d.toLocaleTimeString('bg-BG',{hour:'2-digit',minute:'2-digit'})}</div>
+    </div>
+    <div class="pay-amount">${fmt(p.amount)}</div>
+    <button class="icon-btn" style="margin-left:8px" onclick="deletePayment('${p.id}')">🗑</button>
+  </div>`;
+}
+function methodLabel(m){ return {cash:'В брой',card:'Карта',bank:'Банков превод',other:'Друго'}[m]||'Плащане'; }
+function addPayment(childId){
+  const amt=parseFloat(document.getElementById('payAmount').value);
+  if (!amt || amt<=0){ toast('Въведи валидна сума','error'); return; }
+  db.payments.push({
+    id:uid(), childId, month:curMonth, amount:amt,
+    date:new Date().toISOString(),
+    method:document.getElementById('payMethod').value,
+    note:document.getElementById('payNote').value.trim()
+  });
+  saveDB();
+  toast('✓ Плащането е записано','success');
+  openPaymentSheet(childId);       // refresh sheet
+  renderFees(); renderHome();
+}
+function deletePayment(id){
+  const p=db.payments.find(x=>x.id===id); if(!p) return;
+  db.payments=db.payments.filter(x=>x.id!==id);
+  saveDB();
+  toast('🗑 Плащането е изтрито','success');
+  openPaymentSheet(p.childId);
+  renderFees(); renderHome(); renderReports();
+}
+
+/* ============================================================
+   KIDS (children + groups management)
+   ============================================================ */
+function setKidsTab(t){
+  kidsTab=t;
+  document.querySelectorAll('#kidsTab .seg-btn').forEach(b=>b.classList.toggle('active',b.dataset.t===t));
+  document.getElementById('kidsChildrenView').style.display = t==='children'?'block':'none';
+  document.getElementById('kidsGroupsView').style.display = t==='groups'?'block':'none';
+  renderKids();
+}
+function renderKids(){ if(kidsTab==='children') renderChildren(); else renderGroups(); }
+
+function renderChildren(){
+  const q=(document.getElementById('kidsSearch').value||'').toLowerCase().trim();
+  let kids=db.children.slice();
+  if (q) kids=kids.filter(c=>c.name.toLowerCase().includes(q));
+  kids.sort((a,b)=>a.name.localeCompare(b.name,'bg'));
+  const list=document.getElementById('childrenList');
+  if (db.children.length===0){ list.innerHTML=emptyBox('🧒','Няма деца още','Натисни „Добави дете“'); return; }
+  if (kids.length===0){ list.innerHTML=emptyBox('🔍','Няма резултати',''); return; }
+  list.innerHTML=kids.map(c=>{
+    const g=groupById(c.groupId);
+    return `<div class="manage-row ${c.active===false?'inactive':''}">
+      <div class="child-avatar" style="background:${g?g.color:'#9599b4'}">${esc(initials(c.name)).toUpperCase()}</div>
+      <div class="manage-info" onclick="openChildSheet('${c.id}')" style="cursor:pointer">
+        <div class="manage-title">${esc(c.name)}${c.active===false?' · неактивно':''}</div>
+        <div class="manage-sub">${g?esc(g.name):'Без група'} · ${fmt(feeFor(c))} ${cur$()}/мес${c.parent?' · '+esc(c.parent):''}</div>
+      </div>
+      <button class="icon-btn" onclick="openChildSheet('${c.id}')">✏️</button>
+    </div>`;
+  }).join('');
+}
+
+function renderGroups(){
+  const list=document.getElementById('groupsList');
+  if (db.groups.length===0){ list.innerHTML=emptyBox('👥','Няма групи още','Натисни „Добави група“'); return; }
+  list.innerHTML=db.groups.map(g=>{
+    const n=db.children.filter(c=>c.groupId===g.id).length;
+    return `<div class="manage-row">
+      <div class="child-avatar" style="background:${g.color}">${(g.name[0]||'?').toUpperCase()}</div>
+      <div class="manage-info" onclick="openGroupSheet('${g.id}')" style="cursor:pointer">
+        <div class="manage-title">${esc(g.name)}</div>
+        <div class="manage-sub">${fmt(g.fee||0)} ${cur$()}/мес · ${n} деца</div>
+      </div>
+      <button class="icon-btn" onclick="openGroupSheet('${g.id}')">✏️</button>
+    </div>`;
+  }).join('');
+}
+
+/* ---------- Child sheet ---------- */
+function openChildSheet(id){
+  const c = id ? db.children.find(x=>x.id===id) : null;
+  const groupOpts = db.groups.map(g=>`<option value="${g.id}" ${c&&c.groupId===g.id?'selected':''}>${esc(g.name)}</option>`).join('');
+  setSheet(c?'Редакция на дете':'Ново дете', `
+    <div class="field"><label>Име и фамилия *</label>
+      <input type="text" id="chName" value="${c?esc(c.name):''}" placeholder="напр. Иван Петров"></div>
+    <div class="field"><label>Група</label>
+      <select id="chGroup">
+        <option value="">— Без група —</option>
+        ${groupOpts}
+      </select>
+      ${db.groups.length===0?'<div style="font-size:12px;color:var(--text2);margin-top:6px">Първо създай група в таб „Групи“.</div>':''}
+    </div>
+    <div class="field"><label>Индивидуална такса (${cur$()}) — по избор</label>
+      <input type="number" inputmode="decimal" id="chFee" value="${c&&c.fee!=null&&c.fee!==''?c.fee:''}" placeholder="празно = таксата на групата"></div>
+    <div class="row2">
+      <div class="field"><label>Родител</label>
+        <input type="text" id="chParent" value="${c?esc(c.parent||''):''}" placeholder="име"></div>
+      <div class="field"><label>Телефон</label>
+        <input type="tel" id="chPhone" value="${c?esc(c.phone||''):''}" placeholder="0888..."></div>
+    </div>
+    <div class="field"><label>Бележка</label>
+      <textarea id="chNote" placeholder="по избор">${c?esc(c.note||''):''}</textarea></div>
+    ${c?`<div class="settings-row"><div><div class="lab">Активно</div><div class="desc">Изключи, ако детето вече не тренира</div></div>
+      <input type="checkbox" id="chActive" ${c.active!==false?'checked':''} style="width:22px;height:22px"></div>`:''}
+    <button class="btn btn-primary" style="margin-top:16px" onclick="saveChild(${c?`'${c.id}'`:'null'})">${c?'Запази':'Добави дете'}</button>
+    ${c?`<button class="btn btn-danger" style="margin-top:10px" onclick="deleteChild('${c.id}')">Изтрий детето</button>`:''}
+  `);
+}
+function saveChild(id){
+  const name=document.getElementById('chName').value.trim();
+  if (!name){ toast('Въведи име','error'); return; }
+  const feeRaw=document.getElementById('chFee').value.trim();
+  const data={
+    name,
+    groupId:document.getElementById('chGroup').value||'',
+    fee: feeRaw===''?null:Number(feeRaw),
+    parent:document.getElementById('chParent').value.trim(),
+    phone:document.getElementById('chPhone').value.trim(),
+    note:document.getElementById('chNote').value.trim()
+  };
+  if (id){
+    const c=db.children.find(x=>x.id===id);
+    Object.assign(c,data);
+    c.active=document.getElementById('chActive').checked;
+    toast('✓ Запазено','success');
+  } else {
+    db.children.push({ id:uid(), ...data, active:true, since:curMonth });
+    toast('✓ Детето е добавено','success');
+  }
+  saveDB(); closeSheet(); renderKids(); renderHome();
+}
+function deleteChild(id){
+  const c=db.children.find(x=>x.id===id);
+  const payCount=db.payments.filter(p=>p.childId===id).length;
+  if (!confirm('Изтрий '+c.name+'?'+(payCount?' Ще се изтрият и '+payCount+' плащания.':''))) return;
+  db.children=db.children.filter(x=>x.id!==id);
+  db.payments=db.payments.filter(p=>p.childId!==id);
+  saveDB(); closeSheet(); toast('🗑 Изтрито','success'); renderKids(); renderHome();
+}
+
+/* ---------- Group sheet ---------- */
+function openGroupSheet(id){
+  const g = id ? db.groups.find(x=>x.id===id) : null;
+  const selColor = g?g.color:COLORS[db.groups.length%COLORS.length];
+  setSheet(g?'Редакция на група':'Нова група', `
+    <div class="field"><label>Име на групата *</label>
+      <input type="text" id="grName" value="${g?esc(g.name):''}" placeholder="напр. Футбол U10"></div>
+    <div class="field"><label>Месечна такса (${cur$()}) *</label>
+      <input type="number" inputmode="decimal" id="grFee" value="${g?g.fee:''}" placeholder="напр. 60"></div>
+    <div class="field"><label>Цвят</label>
+      <div class="color-row" id="grColors">
+        ${COLORS.map(col=>`<div class="color-swatch ${col===selColor?'sel':''}" style="background:${col}" data-c="${col}" onclick="pickColor(this)"></div>`).join('')}
+      </div>
+    </div>
+    <button class="btn btn-primary" style="margin-top:8px" onclick="saveGroup(${g?`'${g.id}'`:'null'})">${g?'Запази':'Добави група'}</button>
+    ${g?`<button class="btn btn-danger" style="margin-top:10px" onclick="deleteGroup('${g.id}')">Изтрий групата</button>`:''}
+  `);
+}
+let pickedColor=null;
+function pickColor(el){
+  document.querySelectorAll('#grColors .color-swatch').forEach(s=>s.classList.remove('sel'));
+  el.classList.add('sel'); pickedColor=el.dataset.c;
+}
+function saveGroup(id){
+  const name=document.getElementById('grName').value.trim();
+  const fee=parseFloat(document.getElementById('grFee').value);
+  if (!name){ toast('Въведи име','error'); return; }
+  if (isNaN(fee)||fee<0){ toast('Въведи такса','error'); return; }
+  const color = pickedColor || (document.querySelector('#grColors .sel')?.dataset.c) || COLORS[0];
+  if (id){
+    const g=db.groups.find(x=>x.id===id);
+    g.name=name; g.fee=fee; g.color=color;
+    toast('✓ Запазено','success');
+  } else {
+    db.groups.push({ id:uid(), name, fee, color });
+    toast('✓ Групата е добавена','success');
+  }
+  pickedColor=null;
+  saveDB(); closeSheet(); renderKids(); renderHome();
+}
+function deleteGroup(id){
+  const n=db.children.filter(c=>c.groupId===id).length;
+  if (!confirm('Изтрий групата?'+(n?' '+n+' деца ще останат без група.':''))) return;
+  db.children.forEach(c=>{ if(c.groupId===id) c.groupId=''; });
+  db.groups=db.groups.filter(x=>x.id!==id);
+  saveDB(); closeSheet(); toast('🗑 Изтрито','success'); renderKids(); renderHome();
+}
+
+/* ============================================================
+   REPORTS
+   ============================================================ */
+function renderReports(){
+  const total=db.payments.reduce((s,p)=>s+Number(p.amount||0),0);
+  document.getElementById('repTotal').innerHTML=fmt(total)+' <small>'+cur$()+'</small>';
+  document.getElementById('repKids').textContent=activeChildren().length;
+  document.getElementById('repGroups').textContent=db.groups.length+' групи';
+
+  // приход по месеци (последни 6)
+  const byMonth={};
+  db.payments.forEach(p=>{ byMonth[p.month]=(byMonth[p.month]||0)+Number(p.amount||0); });
+  const months=Object.keys(byMonth).sort().slice(-6);
+  const maxV=Math.max(1,...months.map(m=>byMonth[m]));
+  const rm=document.getElementById('repMonthly');
+  if (months.length===0){ rm.innerHTML='<div style="text-align:center;color:var(--text3);padding:20px 0;font-size:13px">Няма плащания още</div>'; }
+  else {
+    rm.innerHTML=months.map(m=>{
+      const [y,mo]=m.split('-');
+      const w=Math.round(byMonth[m]/maxV*100);
+      return `<div style="margin-bottom:12px">
+        <div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:5px">
+          <span style="font-weight:600">${MONTHS_BG[+mo-1]} ${y}</span>
+          <span style="font-family:var(--mono);font-weight:700">${fmt(byMonth[m])} ${cur$()}</span></div>
+        <div style="height:8px;border-radius:6px;background:var(--bg3);overflow:hidden">
+          <span style="display:block;height:100%;width:${w}%;border-radius:6px;background:linear-gradient(90deg,var(--accent),var(--accent2))"></span></div>
+      </div>`;
+    }).join('');
+  }
+
+  // длъжници текущ месец
+  const debtors=activeChildren().map(c=>({c, owe:Math.max(0, feeFor(c)-paidFor(c.id,curMonth))}))
+                                .filter(x=>x.owe>0 && statusFor(x.c,curMonth)!=='paid')
+                                .sort((a,b)=>b.owe-a.owe);
+  const rd=document.getElementById('repDebtors');
+  if (debtors.length===0){ rd.innerHTML=emptyBox('🎉','Няма длъжници','Всички са платили за '+MONTHS_BG[cur.getMonth()]); }
+  else {
+    rd.innerHTML=debtors.map(({c,owe})=>{
+      const g=groupById(c.groupId);
+      return `<div class="debtor-row">
+        <div class="child-avatar" style="background:${g?g.color:'#9599b4'}">${esc(initials(c.name)).toUpperCase()}</div>
+        <div class="child-info" onclick="openPaymentSheet('${c.id}')" style="cursor:pointer">
+          <div class="child-name">${esc(c.name)}</div>
+          <div class="child-sub">${g?esc(g.name):'Без група'}${c.phone?' · '+esc(c.phone):''}</div>
+        </div>
+        <div class="amt">-${fmt(owe)} ${cur$()}</div>
+      </div>`;
+    }).join('');
+  }
+
+  // последни плащания
+  const recent=db.payments.slice().sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,10);
+  const rp=document.getElementById('repPayments');
+  if (recent.length===0){ rp.innerHTML=emptyBox('💳','Няма плащания още',''); }
+  else {
+    rp.innerHTML=recent.map(p=>{
+      const c=db.children.find(x=>x.id===p.childId);
+      const d=new Date(p.date);
+      const [y,mo]=p.month.split('-');
+      return `<div class="pay-item">
+        <div class="pay-icon">💵</div>
+        <div class="pay-body">
+          <div class="pay-name">${c?esc(c.name):'—'}</div>
+          <div class="pay-when">${MONTHS_BG[+mo-1]} ${y} · ${d.toLocaleDateString('bg-BG')}</div>
+        </div>
+        <div class="pay-amount">${fmt(p.amount)} ${cur$()}</div>
+      </div>`;
+    }).join('');
+  }
+}
+
+function exportCSV(){
+  if (db.payments.length===0){ toast('Няма данни за експорт','error'); return; }
+  const rows=[['Дете','Група','Месец','Сума','Начин','Дата','Бележка']];
+  db.payments.slice().sort((a,b)=>a.month.localeCompare(b.month)).forEach(p=>{
+    const c=db.children.find(x=>x.id===p.childId);
+    const g=c?groupById(c.groupId):null;
+    rows.push([ c?c.name:'', g?g.name:'', p.month, p.amount, methodLabel(p.method), new Date(p.date).toLocaleDateString('bg-BG'), p.note||'' ]);
+  });
+  const csv='﻿'+rows.map(r=>r.map(f=>`"${String(f).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url; a.download='sport-taksi-'+ymKey(new Date())+'.csv';
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+  toast('✓ Файлът е свален','success');
+}
+
+/* ============================================================
+   SETTINGS
+   ============================================================ */
+function openSettings(){
+  const s=db.settings;
+  setSheet('Настройки', `
+    <div class="field"><label>Име (заглавие горе)</label>
+      <input type="text" id="setName" value="${esc(s.orgName||'')}"></div>
+    <div class="field"><label>Подзаглавие</label>
+      <input type="text" id="setSub" value="${esc(s.sub||'')}"></div>
+    <div class="field"><label>Валута</label>
+      <input type="text" id="setCur" value="${esc(s.currency||'лв')}" maxlength="6"></div>
+
+    <div class="settings-row" style="margin-top:6px">
+      <div><div class="lab">Тъмна тема</div><div class="desc">Смени изгледа</div></div>
+      <input type="checkbox" id="setDark" ${s.theme==='dark'?'checked':''} style="width:22px;height:22px" onchange="toggleTheme(this.checked)">
+    </div>
+
+    <button class="btn btn-primary" style="margin-top:16px" onclick="saveSettings()">Запази</button>
+
+    <div class="section-label" style="margin-top:26px">Данни</div>
+    <div class="card">
+      <div class="settings-row" style="padding-top:0">
+        <div><div class="lab">Резервно копие</div><div class="desc">${db.children.length} деца · ${db.payments.length} плащания</div></div>
+      </div>
+      <button class="btn btn-ghost" style="margin-top:4px" onclick="exportBackup()">⬇️ Свали JSON копие</button>
+      <button class="btn btn-ghost" style="margin-top:10px" onclick="document.getElementById('importFile').click()">⬆️ Възстанови от файл</button>
+      <input type="file" id="importFile" accept="application/json" style="display:none" onchange="importBackup(event)">
+      <button class="btn btn-danger" style="margin-top:10px" onclick="wipeData()">Изтрий всички данни</button>
+    </div>
+    <div style="text-align:center;color:var(--text3);font-size:11px;margin-top:20px">Спорт Такси · данните се пазят локално на това устройство</div>
+  `);
+}
+function saveSettings(){
+  db.settings.orgName=document.getElementById('setName').value.trim()||'Спорт Такси';
+  db.settings.sub=document.getElementById('setSub').value.trim();
+  db.settings.currency=document.getElementById('setCur').value.trim()||'лв';
+  saveDB(); applySettings(); closeSheet(); toast('✓ Запазено','success');
+  renderHome(); renderFees(); renderReports();
+}
+function toggleTheme(dark){
+  db.settings.theme=dark?'dark':'light';
+  document.body.setAttribute('data-theme', db.settings.theme);
+  document.querySelector('meta[name=theme-color]').setAttribute('content', dark?'#12131c':'#4f46e5');
+  saveDB();
+}
+function applySettings(){
+  const s=db.settings;
+  document.getElementById('orgName').textContent=s.orgName||'Спорт Такси';
+  document.getElementById('orgSub').textContent=s.sub||'Управление на такси';
+  document.body.setAttribute('data-theme', s.theme||'light');
+  document.querySelector('meta[name=theme-color]').setAttribute('content', s.theme==='dark'?'#12131c':'#4f46e5');
+}
+function exportBackup(){
+  const blob=new Blob([JSON.stringify(db,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url; a.download='sport-taksi-backup-'+ymKey(new Date())+'.json';
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+  toast('✓ Копието е свалено','success');
+}
+function importBackup(ev){
+  const file=ev.target.files[0]; if(!file) return;
+  const r=new FileReader();
+  r.onload=()=>{
+    try{
+      const data=JSON.parse(r.result);
+      if(!data.children||!data.groups||!data.payments) throw new Error('bad');
+      if(!confirm('Това ще замени текущите данни. Продължи?')) return;
+      db=Object.assign({settings:db.settings}, data);
+      db.settings=data.settings||db.settings;
+      saveDB(); applySettings(); closeSheet();
+      toast('✓ Данните са възстановени','success');
+      renderHome(); renderFees(); renderKids(); renderReports();
+    }catch(e){ toast('Невалиден файл','error'); }
+  };
+  r.readAsText(file);
+  ev.target.value='';
+}
+function wipeData(){
+  if(!confirm('Сигурен ли си? Всички деца, групи и плащания ще бъдат изтрити безвъзвратно.')) return;
+  if(!confirm('Наистина изтрий ВСИЧКО?')) return;
+  db={ groups:[], children:[], payments:[], settings:db.settings };
+  saveDB(); closeSheet(); toast('🗑 Всичко е изтрито','success');
+  renderHome(); renderFees(); renderKids(); renderReports();
+}
+
+/* ============================================================
+   SHEET utils
+   ============================================================ */
+function setSheet(title, html){
+  document.getElementById('sheetTitle').textContent=title;
+  document.getElementById('sheetBody').innerHTML=html;
+  document.getElementById('overlay').classList.add('open');
+  document.getElementById('sheet').classList.add('open');
+}
+function closeSheet(){
+  document.getElementById('overlay').classList.remove('open');
+  document.getElementById('sheet').classList.remove('open');
+  pickedColor=null;
+}
+function emptyBox(icon,title,sub){
+  return `<div class="empty"><div class="em-icon">${icon}</div><div class="em-title">${title}</div><div class="em-sub">${sub||''}</div></div>`;
+}
+function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+
+/* ============================================================
+   INIT
+   ============================================================ */
+function seedIfEmpty(){
+  if (db.groups.length || db.children.length || db.payments.length) return;
+  // Демонстрационни данни при първо стартиране
+  const g1=uid(), g2=uid();
+  db.groups=[
+    { id:g1, name:'Футбол U10', fee:60, color:'#16a34a' },
+    { id:g2, name:'Баскетбол U12', fee:70, color:'#f97316' }
+  ];
+  const c1=uid(),c2=uid(),c3=uid(),c4=uid();
+  db.children=[
+    { id:c1, name:'Иван Петров', groupId:g1, fee:null, parent:'Петър Петров', phone:'0888123456', note:'', active:true, since:curMonth },
+    { id:c2, name:'Мария Георгиева', groupId:g1, fee:null, parent:'Анна Георгиева', phone:'0899222333', note:'', active:true, since:curMonth },
+    { id:c3, name:'Георги Димитров', groupId:g2, fee:null, parent:'', phone:'', note:'', active:true, since:curMonth },
+    { id:c4, name:'Елена Иванова', groupId:g2, fee:50, parent:'', phone:'', note:'намаление', active:true, since:curMonth }
+  ];
+  db.payments=[
+    { id:uid(), childId:c1, month:curMonth, amount:60, date:new Date().toISOString(), method:'cash', note:'' }
+  ];
+  saveDB();
+}
+
+function init(){
+  seedIfEmpty();
+  applySettings();
+  updateMonthLabels();
+  renderHome();
+}
+init();
+</script>
+</body>
+</html>
