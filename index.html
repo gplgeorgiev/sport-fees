@@ -439,10 +439,10 @@ function renderHome(){
   const kids = activeChildren();
   let collected=0, expected=0, paidCount=0, debtCount=0, debtSum=0;
   kids.forEach(c=>{
-    const fee=feeFor(c), paid=Math.min(paidFor(c.id,curMonth), fee||paidFor(c.id,curMonth));
+    const fee=feeFor(c);
     const realPaid=paidFor(c.id,curMonth);
     expected+=fee;
-    collected+=Math.min(realPaid, fee||realPaid);
+    collected+=realPaid;            // реално получени пари за месеца (вкл. надплащане)
     const st=statusFor(c,curMonth);
     if (st==='paid') paidCount++;
     else { debtCount++; debtSum += Math.max(0, fee-realPaid); }
