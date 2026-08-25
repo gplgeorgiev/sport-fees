@@ -567,6 +567,7 @@ function openPaymentSheet(childId){
   const fee=feeFor(c);
   const paid=paidFor(childId,curMonth);
   const remaining=Math.max(0, fee-paid);
+  const fullyPaid = fee>0 && remaining<=0;   // напълно платено за месеца
   const monthLbl=MONTHS_BG[cur.getMonth()]+' '+cur.getFullYear();
   const history=db.payments.filter(p=>p.childId===childId && p.month===curMonth)
                            .sort((a,b)=>new Date(b.date)-new Date(a.date));
@@ -585,9 +586,16 @@ function openPaymentSheet(childId){
       <div class="stat-card"><div class="stat-label">Остатък</div><div class="stat-value ${remaining>0?'red':'green'}" style="font-size:18px">${fmt(remaining)} <small>${cur$()}</small></div></div>
     </div>
 
+    ${fullyPaid ? `
+    <div class="card" style="text-align:center;padding:18px">
+      <div style="font-size:30px;margin-bottom:6px">✅</div>
+      <div style="font-weight:700;margin-bottom:4px">Платено за ${monthLbl}</div>
+      <div style="font-size:12.5px;color:var(--text2)">За да платиш за друг месец, превключи месеца горе със стрелките ‹ ›.</div>
+    </div>
+    ` : `
     <div class="field">
       <label>Сума на плащане (${cur$()})</label>
-      <input type="number" inputmode="decimal" id="payAmount" value="${remaining>0?remaining:fee}" step="0.01">
+      <input type="number" inputmode="decimal" id="payAmount" value="${remaining}" step="0.01">
     </div>
     <div class="field">
       <label>Начин</label>
@@ -603,6 +611,7 @@ function openPaymentSheet(childId){
       <input type="text" id="payNote" placeholder="напр. частично плащане">
     </div>
     <button class="btn btn-primary" onclick="addPayment('${childId}')">Запиши плащане</button>
+    `}
 
     ${history.length? `<div class="section-label" style="margin-top:22px">Плащания този месец</div>${history.map(p=>payHistRow(p)).join('')}`:''}
   `);
@@ -622,8 +631,21 @@ function payHistRow(p){
 }
 function methodLabel(m){ return {cash:'В брой',card:'Карта',bank:'Банков превод',other:'Друго'}[m]||'Плащане'; }
 function addPayment(childId){
+  const c=db.children.find(x=>x.id===childId); if(!c) return;
   const amt=parseFloat(document.getElementById('payAmount').value);
   if (!amt || amt<=0){ toast('Въведи валидна сума','error'); return; }
+  const fee=feeFor(c);
+  const already=paidFor(childId,curMonth);
+  const remaining=Math.max(0, fee-already);
+  // Не се допуска надплащане за един месец
+  if (fee>0 && remaining<=0){
+    toast('Вече е платено за този месец. Избери друг месец горе (‹ ›).','error');
+    return;
+  }
+  if (fee>0 && amt>remaining+0.001){
+    toast('Максимум '+fmt(remaining)+' '+cur$()+' за този месец','error');
+    return;
+  }
   db.payments.push({
     id:uid(), childId, month:curMonth, amount:amt,
     date:new Date().toISOString(),
