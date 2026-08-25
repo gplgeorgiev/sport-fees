@@ -224,8 +224,8 @@
   <div class="stats-grid">
     <div class="stat-card wide">
       <div class="stat-label">Събрано този месец</div>
-      <div class="stat-value" id="homeCollected">0 <small>лв</small></div>
-      <div class="stat-sub" id="homeExpectedSub">от 0 лв очаквани</div>
+      <div class="stat-value" id="homeCollected">0 <small>€</small></div>
+      <div class="stat-sub" id="homeExpectedSub">от 0 € очаквани</div>
       <div class="progress"><span id="homeProgress" style="width:0%"></span></div>
     </div>
     <div class="stat-card">
@@ -236,7 +236,7 @@
     <div class="stat-card">
       <div class="stat-label">Дължат</div>
       <div class="stat-value red" id="homeDebtCount">0</div>
-      <div class="stat-sub" id="homeDebtSum">0 лв дълг</div>
+      <div class="stat-sub" id="homeDebtSum">0 € дълг</div>
     </div>
   </div>
 
@@ -297,7 +297,7 @@
   <div class="stats-grid">
     <div class="stat-card">
       <div class="stat-label">Общо събрано</div>
-      <div class="stat-value green" id="repTotal">0 <small>лв</small></div>
+      <div class="stat-value green" id="repTotal">0 <small>€</small></div>
       <div class="stat-sub" id="repTotalSub">за цялата история</div>
     </div>
     <div class="stat-card">
@@ -362,7 +362,7 @@ function loadDB() {
     const raw = localStorage.getItem(STORE_KEY);
     if (raw) return JSON.parse(raw);
   } catch(e){}
-  return { groups:[], children:[], payments:[], settings:{ orgName:'Спорт Такси', sub:'Управление на такси', currency:'лв', theme:'light' } };
+  return { groups:[], children:[], payments:[], settings:{ orgName:'Спорт Такси', sub:'Управление на такси', currency:'€', theme:'light' } };
 }
 function saveDB() { localStorage.setItem(STORE_KEY, JSON.stringify(db)); }
 function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
@@ -370,7 +370,7 @@ function uid() { return Date.now().toString(36) + Math.random().toString(36).sli
 /* ---------- Helpers ---------- */
 function ymKey(d){ return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0'); }
 function fmt(n){ return (Math.round(n*100)/100).toLocaleString('bg-BG'); }
-function cur$(){ return db.settings.currency || 'лв'; }
+function cur$(){ return db.settings.currency || '€'; }
 function initials(name){ const p=name.trim().split(/\s+/); return ((p[0]||'')[0]||'') + (p.length>1?(p[p.length-1][0]||''):'') ; }
 function groupById(id){ return db.groups.find(g=>g.id===id); }
 function activeChildren(){ return db.children.filter(c=>c.active!==false); }
@@ -903,7 +903,7 @@ function openSettings(){
     <div class="field"><label>Подзаглавие</label>
       <input type="text" id="setSub" value="${esc(s.sub||'')}"></div>
     <div class="field"><label>Валута</label>
-      <input type="text" id="setCur" value="${esc(s.currency||'лв')}" maxlength="6"></div>
+      <input type="text" id="setCur" value="${esc(s.currency||'€')}" maxlength="6"></div>
 
     <div class="settings-row" style="margin-top:6px">
       <div><div class="lab">Тъмна тема</div><div class="desc">Смени изгледа</div></div>
@@ -928,7 +928,7 @@ function openSettings(){
 function saveSettings(){
   db.settings.orgName=document.getElementById('setName').value.trim()||'Спорт Такси';
   db.settings.sub=document.getElementById('setSub').value.trim();
-  db.settings.currency=document.getElementById('setCur').value.trim()||'лв';
+  db.settings.currency=document.getElementById('setCur').value.trim()||'€';
   saveDB(); applySettings(); closeSheet(); toast('✓ Запазено','success');
   renderHome(); renderFees(); renderReports();
 }
